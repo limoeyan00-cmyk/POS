@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  Search, 
-  Plus, 
-  Minus, 
-  Trash2, 
-  ShoppingCart, 
-  Banknote, 
-  Smartphone, 
-  CreditCard 
+import {
+  Search,
+  Plus,
+  Minus,
+  Trash2,
+  ShoppingCart,
+  Banknote,
+  Smartphone,
+  CreditCard
 } from 'lucide-react';
 import { db } from '../services/db';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -27,7 +27,7 @@ export function Sales({ onComplete }) {
     setCart(prev => {
       const existing = prev.find(item => item.id === product.id);
       if (existing) {
-        return prev.map(item => 
+        return prev.map(item =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
@@ -60,9 +60,9 @@ export function Sales({ onComplete }) {
       <div className="product-selection">
         <div className="search-bar card">
           <Search size={20} className="search-icon" />
-          <input 
-            type="text" 
-            placeholder="Search by product name or scan barcode..." 
+          <input
+            type="text"
+            placeholder="Search by product name or scan barcode..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             autoFocus
@@ -141,21 +141,21 @@ export function Sales({ onComplete }) {
           </div>
 
           <div className="payment-methods">
-            <button 
+            <button
               className={`method-btn ${paymentMethod === 'cash' ? 'active' : ''}`}
               onClick={() => setPaymentMethod('cash')}
             >
               <Banknote size={20} />
               <span>Cash</span>
             </button>
-            <button 
+            <button
               className={`method-btn ${paymentMethod === 'mpesa' ? 'active' : ''}`}
               onClick={() => setPaymentMethod('mpesa')}
             >
               <Smartphone size={20} />
               <span>M-Pesa</span>
             </button>
-            <button 
+            <button
               className={`method-btn ${paymentMethod === 'card' ? 'active' : ''}`}
               onClick={() => setPaymentMethod('card')}
             >
@@ -168,9 +168,9 @@ export function Sales({ onComplete }) {
             <div className="cash-inputs">
               <div className="input-group">
                 <label>Amount Received</label>
-                <input 
-                  type="number" 
-                  placeholder="0.00" 
+                <input
+                  type="number"
+                  placeholder="0.00"
                   value={amountReceived}
                   onChange={(e) => setAmountReceived(e.target.value)}
                 />
