@@ -1,59 +1,97 @@
 import React, { useState } from 'react';
-import { Lock, User, Eye, EyeOff } from 'lucide-react';
+import { User, KeyRound, CheckCircle2, XCircle } from 'lucide-react';
 
 export function Login({ onLogin }) {
-  const [showPassword, setShowPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState('user');
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onLogin();
+    setIsVerifying(true);
+    
+    // Simulate verification delay
+    setTimeout(() => {
+      setIsVerifying(false);
+      onLogin();
+    }, 800);
   };
 
   return (
     <div className="login-screen">
-      <div className="login-card card">
-        <div className="login-header">
-          <div className="login-logo">POS</div>
-          <h1>Welcome Back</h1>
-          <p>Please sign in to your terminal</p>
+      <div className="login-container">
+        <div className="login-tabs">
+          <button 
+            className={`tab ${activeTab === 'user' ? 'active' : ''}`}
+            onClick={() => setActiveTab('user')}
+          >
+            <User size={14} className="tab-icon" />
+            User Login
+          </button>
+          <button 
+            className={`tab ${activeTab === 'scanner' ? 'active' : ''}`}
+            onClick={() => setActiveTab('scanner')}
+          >
+            <KeyRound size={14} className="tab-icon" />
+            ScannerLogin
+          </button>
         </div>
 
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Username</label>
-            <div className="input-wrapper">
-              <User className="input-icon" size={18} />
-              <input 
-                type="text" 
-                placeholder="Enter username" 
-                required 
-              />
-            </div>
-          </div>
+        <div className="login-body card">
+          {activeTab === 'user' ? (
+            <form className="login-form" onSubmit={handleSubmit}>
+              <div className="login-content">
+                <div className="avatar-section">
+                  <div className="avatar-placeholder">
+                    <User size={64} color="#94a3b8" />
+                  </div>
+                </div>
 
-          <div className="form-group">
-            <label>Password</label>
-            <div className="input-wrapper">
-              <Lock className="input-icon" size={18} />
-              <input 
-                type={showPassword ? 'text' : 'password'} 
-                placeholder="Enter password" 
-                required 
-              />
-              <button 
-                type="button" 
-                className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
+                <div className="fields-section">
+                  <div className="form-group row">
+                    <label>Username:</label>
+                    <input type="text" defaultValue="admin" required />
+                  </div>
 
-          <button type="submit" className="primary-btn login-btn">
-            Login to Terminal
-          </button>
-        </form>
+                  <div className="form-group row">
+                    <label>Password:</label>
+                    <input type="password" defaultValue="•••••" required />
+                  </div>
+
+                  <div className="form-group row">
+                    <label>Shift:</label>
+                    <select defaultValue="Day">
+                      <option value="Day">Day</option>
+                      <option value="Night">Night</option>
+                    </select>
+                  </div>
+
+                  {isVerifying && (
+                    <div className="verifying-status">
+                      <div className="dots-loader"></div>
+                      <span>Verifying...</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="login-actions">
+                <button type="submit" className="action-btn ok-btn" disabled={isVerifying}>
+                  <CheckCircle2 size={16} color="var(--accent)" />
+                  Ok
+                </button>
+                <button type="button" className="action-btn cancel-btn" disabled={isVerifying}>
+                  <XCircle size={16} color="var(--danger)" />
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="scanner-login-placeholder">
+              <KeyRound size={48} color="#cbd5e1" />
+              <p>Please scan your ID card to login</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <style jsx="true">{`
@@ -63,113 +101,183 @@ export function Login({ onLogin }) {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: radial-gradient(circle at top right, #0F2A43, #0A2540);
+          background: rgba(15, 42, 67, 0.4); /* Semi-transparent overlay */
+          backdrop-filter: blur(2px);
         }
 
-        .login-card {
-          width: 100%;
-          max-width: 400px;
-          padding: var(--spacing-6) var(--spacing-4);
-          text-align: center;
-          background: rgba(255, 255, 255, 0.98);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        .login-container {
+          width: 480px;
+          display: flex;
+          flex-direction: column;
         }
 
-        .login-header {
-          margin-bottom: var(--spacing-4);
+        .login-tabs {
+          display: flex;
+          gap: 4px;
+          padding-left: 8px;
         }
 
-        .login-logo {
-          width: 64px;
-          height: 64px;
-          background: var(--accent);
-          color: white;
-          border-radius: 14px;
+        .tab {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 16px;
+          background: #f1f5f9;
+          border: 1px solid #cbd5e1;
+          border-bottom: none;
+          border-radius: 6px 6px 0 0;
+          color: var(--text-secondary);
+          font-size: 0.8125rem;
+          font-weight: 600;
+          cursor: pointer;
+        }
+
+        .tab.active {
+          background: white;
+          color: var(--primary);
+          position: relative;
+          z-index: 2;
+        }
+
+        .tab-icon {
+          color: inherit;
+        }
+
+        .login-body {
+          background: white;
+          border: 1px solid #cbd5e1;
+          border-radius: 4px;
+          padding: 24px;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+          position: relative;
+          z-index: 1;
+          margin-top: -1px;
+        }
+
+        .login-content {
+          display: flex;
+          gap: 32px;
+          margin-bottom: 24px;
+        }
+
+        .avatar-section {
           display: flex;
           align-items: center;
           justify-content: center;
-          font-weight: 800;
-          font-size: 1.5rem;
-          margin: 0 auto var(--spacing-3);
-          box-shadow: 0 8px 16px rgba(0, 168, 107, 0.3);
         }
 
-        .login-header h1 {
-          font-size: 1.75rem;
-          margin-bottom: 4px;
-          color: var(--primary);
-          letter-spacing: -0.5px;
-        }
-
-        .login-header p {
-          color: var(--text-secondary);
-          font-size: 0.9375rem;
-          font-weight: 500;
-        }
-
-        .login-form {
-          text-align: left;
-          display: flex;
-          flex-direction: column;
-          gap: var(--spacing-3);
-        }
-
-        .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .form-group label {
-          font-size: 0.875rem;
-          font-weight: 700;
-          color: var(--primary);
-        }
-
-        .input-wrapper {
-          position: relative;
+        .avatar-placeholder {
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          background: #f1f5f9;
           display: flex;
           align-items: center;
+          justify-content: center;
+          border: 4px solid white;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        .input-icon {
-          position: absolute;
-          left: 14px;
-          color: var(--text-secondary);
+        .fields-section {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
         }
 
-        .input-wrapper input {
-          width: 100%;
-          height: var(--input-height);
-          padding: 0 14px 0 44px;
-          border: 1.5px solid var(--border);
-          border-radius: var(--radius-btn);
-          font-family: inherit;
-          font-size: 1rem;
+        .form-group.row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .form-group.row label {
+          width: 80px;
+          text-align: right;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: var(--primary);
+        }
+
+        .form-group.row input,
+        .form-group.row select {
+          flex: 1;
+          height: 32px;
+          border: 1px solid #cbd5e1;
+          border-radius: 4px;
+          padding: 0 10px;
+          font-size: 0.875rem;
           outline: none;
-          transition: all 0.2s;
-          background: #fcfcfc;
         }
 
-        .input-wrapper input:focus {
+        .form-group.row input:focus,
+        .form-group.row select:focus {
           border-color: var(--accent);
-          background: white;
-          box-shadow: 0 0 0 4px rgba(0, 168, 107, 0.1);
         }
 
-        .toggle-password {
-          position: absolute;
-          right: 14px;
+        .verifying-status {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          margin-top: 8px;
           color: var(--text-secondary);
-          padding: 4px;
+          font-size: 0.875rem;
+          font-style: italic;
         }
 
-        .login-btn {
-          width: 100%;
-          margin-top: var(--spacing-2);
-          font-size: 1.125rem;
-          box-shadow: 0 4px 12px rgba(0, 168, 107, 0.2);
+        .dots-loader {
+          width: 24px;
+          height: 24px;
+          border: 3px solid #e2e8f0;
+          border-top-color: var(--accent);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        .login-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 12px;
+          padding-top: 16px;
+          border-top: 1px solid #f1f5f9;
+        }
+
+        .action-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 16px;
+          background: #f8fafc;
+          border: 1px solid #cbd5e1;
+          border-radius: 4px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: var(--primary);
+          cursor: pointer;
+        }
+
+        .action-btn:hover:not(:disabled) {
+          background: #f1f5f9;
+        }
+
+        .action-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .scanner-login-placeholder {
+          height: 200px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          color: var(--text-secondary);
         }
       `}</style>
     </div>

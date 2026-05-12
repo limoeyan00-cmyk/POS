@@ -19,7 +19,8 @@ db.on('ready', async () => {
       { key: 'businessName', value: 'Antigravity SME' },
       { key: 'currency', value: 'KES' },
       { key: 'lowStockThreshold', value: 10 },
-      { key: 'kraIntegration', value: false }
+      { key: 'kraIntegration', value: false },
+      { key: 'businessMode', value: 'retail' }
     ]);
   }
 });

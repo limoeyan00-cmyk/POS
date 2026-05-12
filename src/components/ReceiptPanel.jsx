@@ -1,8 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, Printer, ShoppingCart } from 'lucide-react';
 
 export function ReceiptPanel({ isOpen, onClose, saleData }) {
+  const [toastMessage, setToastMessage] = useState('');
+
   if (!isOpen) return null;
+
+  const handlePrint = () => {
+    // 1. Browser Print (Primary) - using @media print CSS below
+    window.print();
+    
+    // Simulate "Receipt sent to printer" toast
+    setToastMessage('Receipt sent to printer');
+    setTimeout(() => {
+      setToastMessage('');
+      onClose(); // Automatically return to cashier screen
+    }, 2000);
+  };
 
   return (
     <div className="receipt-overlay">
@@ -80,8 +94,8 @@ export function ReceiptPanel({ isOpen, onClose, saleData }) {
           </div>
         </div>
 
-        <div className="panel-actions">
-          <button className="primary-btn print-btn">
+        <div className="panel-actions no-print">
+          <button className="primary-btn print-btn" onClick={handlePrint}>
             <Printer size={20} />
             <span>Print Receipt</span>
           </button>
@@ -89,9 +103,15 @@ export function ReceiptPanel({ isOpen, onClose, saleData }) {
             <ShoppingCart size={20} />
             <span>New Sale</span>
           </button>
-          <button className="text-btn reprint-link">Reprint Last Receipt</button>
+          <button className="text-btn reprint-link" onClick={handlePrint}>Reprint Last Receipt</button>
         </div>
       </div>
+
+      {toastMessage && (
+        <div className="toast-notification no-print">
+          {toastMessage}
+        </div>
+      )}
 
       <style jsx="true">{`
         .receipt-overlay {
@@ -250,6 +270,109 @@ export function ReceiptPanel({ isOpen, onClose, saleData }) {
           font-size: 0.875rem;
           color: var(--text-secondary);
           text-decoration: underline;
+        }
+
+        .toast-notification {
+          position: fixed;
+          bottom: 24px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: var(--accent);
+          color: white;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 0.9375rem;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          z-index: 2000;
+          animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+          from { transform: translate(-50%, 100%); opacity: 0; }
+          to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        /* 80mm Thermal Printer Styles */
+        @media print {
+          @page {
+            margin: 0;
+            size: 80mm auto;
+          }
+
+          body * {
+            visibility: hidden;
+          }
+
+          .receipt-thermal, .receipt-thermal * {
+            visibility: visible;
+          }
+
+          .receipt-thermal {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 80mm !important;
+            max-width: 80mm !important;
+            padding: 4mm !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            background: white;
+            color: black;
+            font-family: 'Courier New', Courier, monospace !important;
+          }
+
+          .no-print {
+            display: none !important;
+          }
+
+          .receipt-overlay {
+            position: static;
+            background: transparent;
+            backdrop-filter: none;
+          }
+
+          .receipt-panel {
+            box-shadow: none;
+            width: 100%;
+            height: auto;
+          }
+
+          .receipt-scroll {
+            padding: 0;
+            background: transparent;
+          }
+
+          /* Ensure all text is black */
+          .receipt-thermal * {
+            color: #000 !important;
+          }
+
+          /* Monospace specific adjustments */
+          .biz-name {
+            font-size: 22px !important;
+            font-weight: bold !important;
+          }
+
+          .receipt-header p,
+          .receipt-meta,
+          .receipt-footer {
+            font-size: 12px !important;
+          }
+
+          .receipt-table th,
+          .receipt-table td {
+            font-size: 12px !important;
+          }
+
+          .grand-total {
+            font-size: 18px !important;
+            font-weight: bold !important;
+          }
+
+          .divider {
+            border-top: 1px dashed #000 !important;
+          }
         }
       `}</style>
     </div>

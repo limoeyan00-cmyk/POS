@@ -8,7 +8,8 @@ import {
   ToggleRight,
   AlertCircle,
   Save,
-  Upload
+  Upload,
+  Printer
 } from 'lucide-react';
 
 export function Settings() {
@@ -18,7 +19,7 @@ export function Settings() {
   const sections = [
     { id: 'profile', label: 'Business Profile', icon: Building2 },
     { id: 'users', label: 'Users & Staff', icon: Users2 },
-    { id: 'preferences', label: 'Preferences', icon: Settings2 },
+    { id: 'printer', label: 'Printer Settings', icon: Printer },
     { id: 'kra', label: 'KRA Integration', icon: ShieldCheck },
   ];
 
@@ -120,10 +121,55 @@ export function Settings() {
             </div>
           )}
 
-          {/* Users and Preferences would go here - placeholder for brevity */}
-          {(activeSection === 'users' || activeSection === 'preferences') && (
+          {activeSection === 'printer' && (
+            <div className="settings-section">
+              <div className="section-header">
+                <h2>Printer Settings</h2>
+                <p>Configure thermal receipt printer and printing behavior</p>
+              </div>
+
+              <div className="profile-form">
+                <div className="form-grid">
+                  <div className="form-group full">
+                    <label>Default Printer Name</label>
+                    <input type="text" placeholder="e.g. POS-80C" defaultValue="POS-80" />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Paper Width</label>
+                    <select defaultValue="80mm" style={{ height: '44px', border: '1px solid var(--border)', borderRadius: '8px', padding: '0 12px' }}>
+                      <option value="80mm">80mm (Standard)</option>
+                      <option value="58mm">58mm (Narrow)</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group"></div>
+
+                  <div className="form-group full" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '12px' }}>
+                    <input type="checkbox" id="autoprint" defaultChecked style={{ width: '20px', height: '20px' }} />
+                    <label htmlFor="autoprint" style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 600 }}>Auto-print receipt after sale</label>
+                  </div>
+
+                  <div className="form-group full" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '12px' }}>
+                    <input type="checkbox" id="printcopy" style={{ width: '20px', height: '20px' }} />
+                    <label htmlFor="printcopy" style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 600 }}>Print receipt copy (2 copies)</label>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '24px' }}>
+                  <button className="secondary-btn" onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Printer size={16} />
+                    Test Print
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Users would go here - placeholder for brevity */}
+          {activeSection === 'users' && (
             <div className="empty-settings">
-              <Settings2 size={48} className="text-muted" />
+              <Users2 size={48} className="text-muted" />
               <p>Settings section for {activeSection} coming soon.</p>
             </div>
           )}

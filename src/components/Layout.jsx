@@ -1,143 +1,202 @@
-import React, { useState, useEffect } from 'react';
-import { Sidebar } from './Sidebar';
-import { Wifi, WifiOff, Clock } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { MinusSquare, XSquare, LogOut, Settings as SettingsIcon, Wrench, FileText } from 'lucide-react';
+import { db } from '../services/db';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { DeveloperPanel } from './DeveloperPanel';
 
-export function Layout({ children, activePage, setActivePage, title }) {
-  const [time, setTime] = useState(new Date());
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+export function Layout({ children, onNavigate, onLogout }) {
+  const [dateStr, setDateStr] = useState('');
+  const [isDevPanelOpen, setIsDevPanelOpen] = useState(false);
+  const clickCount = useRef(0);
+  const clickTimer = useRef(null);
 
+  const modeSetting = useLiveQuery(() => db.settings.get('businessMode'));
+  const currentMode = modeSetting?.value || 'retail';
+  
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      clearInterval(timer);
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
+    const d = new Date();
+    setDateStr(`${d.getDate().toString().padStart(2, '0')} ${d.toLocaleString('default', { month: 'short' })} ${d.getFullYear()}`);
   }, []);
 
+  const handleModeClick = () => {
+    clickCount.current += 1;
+    
+    if (clickTimer.current) clearTimeout(clickTimer.current);
+    
+    if (clickCount.current >= 5) {
+      setIsDevPanelOpen(true);
+      clickCount.current = 0;
+    } else {
+      clickTimer.current = setTimeout(() => {
+        clickCount.current = 0;
+      }, 1000);
+    }
+  };
+
   return (
-    <div className="app-shell">
-      <Sidebar activePage={activePage} setActivePage={setActivePage} />
-      
-      <div className="main-wrapper">
-        <header className="header">
-          <div className="header-left">
-            <h2 className="page-title">{title}</h2>
+    <div className="navi-app-shell">
+      {/* Topmost OS-like bar */}
+      <div className="navi-top-bar">
+        <div className="top-bar-left">
+          <div 
+            className="retail-mode-badge" 
+            onClick={handleModeClick}
+            style={{ cursor: 'default', userSelect: 'none' }}
+            title="Business Mode (Internal)"
+          >
+            {currentMode === 'restaurant' ? 'Restaurant Mode' : 'Retail Mode'}
           </div>
-          
-          <div className="header-center">
-            <div className="user-status">
-              <span className="user-pill">Admin Terminal</span>
-            </div>
+        </div>
+        
+        <div className="top-bar-center">
+          <div className="transaction-date">
+            <span>Transaction Date: </span>
+            <span className="date-box">{dateStr}</span>
           </div>
-
-          <div className="header-right">
-            <div className={`status-pill ${isOnline ? 'online' : 'offline'}`}>
-              {isOnline ? <Wifi size={16} /> : <WifiOff size={16} />}
-              <span>{isOnline ? 'Online' : 'Offline'}</span>
-            </div>
-            <div className="time-display">
-              <Clock size={16} />
-              <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-            </div>
+        </div>
+        
+        <div className="top-bar-right">
+          <div className="change-prev">
+            <span className="icon-search">🔍</span>
+            <span>Change from previous transaction: <strong className="text-danger">0</strong></span>
           </div>
-        </header>
-
-        <main className="main-content">
-          {children}
-        </main>
+          <div className="window-controls">
+            <button className="win-btn"><MinusSquare size={16} /> Minimize</button>
+            <button className="win-btn" onClick={onLogout}><LogOut size={16} /> Logout</button>
+            <button className="win-btn text-danger"><XSquare size={16} /> Exit</button>
+          </div>
+        </div>
       </div>
 
-      <style jsx="true">{`
-        .app-shell {
-          display: flex;
-          min-height: 100vh;
-        }
+      {/* Menu Bar */}
+      <div className="navi-menu-bar">
+        <button className="menu-item" onClick={() => onNavigate('sale')}>
+          <FileText size={14} /> File
+        </button>
+        <button className="menu-item" onClick={() => onNavigate('inventory')}>
+          <Wrench size={14} /> Tools
+        </button>
+        <button className="menu-item" onClick={() => onNavigate('settings')}>
+          <SettingsIcon size={14} /> Settings
+        </button>
+      </div>
 
-        .main-wrapper {
-          flex: 1;
-          margin-left: var(--sidebar-width);
+      <div className="navi-main-content">
+        {children}
+      </div>
+
+      <DeveloperPanel 
+        isOpen={isDevPanelOpen} 
+        onClose={() => setIsDevPanelOpen(false)} 
+        currentMode={currentMode}
+      />
+
+      <style jsx="true">{`
+        .navi-app-shell {
           display: flex;
           flex-direction: column;
           height: 100vh;
+          width: 100vw;
+          overflow: hidden;
+          background: #f1f5f9;
         }
 
-        .header {
-          height: var(--header-height);
+        .navi-top-bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: #e2e8f0;
+          border-bottom: 1px solid #cbd5e1;
+          padding: 4px 8px;
+          font-size: 0.75rem;
+          color: var(--text-secondary);
+        }
+
+        .retail-mode-badge {
           background: white;
-          border-bottom: 1px solid var(--border);
+          border: 1px solid #cbd5e1;
+          padding: 2px 12px;
+          color: var(--primary);
+          font-weight: 600;
+        }
+
+        .transaction-date {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          padding: 0 var(--spacing-3);
-          position: sticky;
-          top: 0;
-          z-index: 90;
+          gap: 6px;
         }
 
-        .page-title {
-          font-size: 1.25rem;
+        .date-box {
+          background: white;
+          border: 1px solid #cbd5e1;
+          padding: 2px 8px;
+          font-weight: 600;
+        }
+
+        .top-bar-right {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .change-prev {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .text-danger {
+          color: var(--danger);
+        }
+
+        .window-controls {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .win-btn {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          background: transparent;
+          border: none;
+          color: var(--text-secondary);
+          cursor: pointer;
+        }
+
+        .win-btn:hover {
           color: var(--primary);
         }
 
-        .user-pill {
-          background: var(--background);
-          padding: 6px 12px;
-          border-radius: var(--radius-badge);
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: var(--text-secondary);
-        }
-
-        .header-right {
+        .navi-menu-bar {
           display: flex;
-          align-items: center;
-          gap: var(--spacing-2);
+          background: #f8fafc;
+          border-bottom: 1px solid #cbd5e1;
+          padding: 2px 8px;
         }
 
-        .status-pill {
+        .menu-item {
           display: flex;
           align-items: center;
           gap: 6px;
+          background: transparent;
+          border: none;
           padding: 4px 12px;
-          border-radius: var(--radius-badge);
-          font-size: 0.75rem;
-          font-weight: 700;
-          text-transform: uppercase;
+          font-size: 0.8125rem;
+          color: var(--primary);
+          cursor: pointer;
         }
 
-        .status-pill.online {
-          background: #ecfdf5;
-          color: #059669;
+        .menu-item:hover {
+          background: #e2e8f0;
         }
 
-        .status-pill.offline {
-          background: #fef2f2;
-          color: #dc2626;
-        }
-
-        .time-display {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          color: var(--text-secondary);
-          font-weight: 600;
-          font-size: 0.875rem;
-          padding-left: var(--spacing-2);
-          border-left: 1px solid var(--border);
-        }
-
-        .main-content {
+        .navi-main-content {
           flex: 1;
-          padding: var(--spacing-3);
-          overflow-y: auto;
-          background: var(--background);
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
         }
       `}</style>
     </div>
