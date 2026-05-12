@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold">Dashboard</h1>
+    <p class="text-slate-500">Overview of today's business performance.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-xl border shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <span class="text-xs font-bold text-emerald-600">+12%</span>
+        </div>
+        <h3 class="text-slate-500 text-sm font-medium">Daily Revenue</h3>
+        <p class="text-2xl font-bold mt-1">KES 0</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl border shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                <i class="fas fa-shopping-basket"></i>
+            </div>
+            <span class="text-xs font-bold text-blue-600">+5%</span>
+        </div>
+        <h3 class="text-slate-500 text-sm font-medium">Total Orders</h3>
+        <p class="text-2xl font-bold mt-1">0</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl border shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div class="p-2 bg-amber-50 text-amber-600 rounded-lg">
+                <i class="fas fa-credit-card"></i>
+            </div>
+            <span class="text-xs font-bold text-amber-600">Action Needed</span>
+        </div>
+        <h3 class="text-slate-500 text-sm font-medium">Credit Owed</h3>
+        <p class="text-2xl font-bold mt-1 text-amber-600">KES 0</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl border shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div class="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                <i class="fas fa-users"></i>
+            </div>
+            <span class="text-xs font-bold text-purple-600">+3 today</span>
+        </div>
+        <h3 class="text-slate-500 text-sm font-medium">Total Customers</h3>
+        <p class="text-2xl font-bold mt-1">0</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+        <div class="p-6 border-b flex items-center justify-between">
+            <h2 class="font-bold">Recent Transactions</h2>
+            <a href="/reports" class="text-emerald-600 text-sm font-bold hover:underline">View All</a>
+        </div>
+        <div class="p-6 text-center py-12 text-slate-400">
+            <i class="fas fa-receipt text-4xl mb-4 opacity-20"></i>
+            <p>No transactions recorded yet today.</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl border shadow-sm p-6">
+        <h2 class="font-bold mb-6">Quick Actions</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <a href="/billing" class="flex flex-col items-center gap-3 p-6 rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition text-center">
+                <i class="fas fa-plus-circle text-2xl"></i>
+                <span class="font-bold text-sm">New Bill</span>
+            </a>
+            <a href="/customers" class="flex flex-col items-center gap-3 p-6 rounded-xl border border-blue-100 bg-blue-50 text-blue-700 hover:bg-blue-100 transition text-center">
+                <i class="fas fa-user-plus text-2xl"></i>
+                <span class="font-bold text-sm">Add Customer</span>
+            </a>
+            <a href="/inventory" class="flex flex-col items-center gap-3 p-6 rounded-xl border border-slate-100 bg-slate-50 text-slate-700 hover:bg-slate-100 transition text-center">
+                <i class="fas fa-box text-2xl"></i>
+                <span class="font-bold text-sm">Add Product</span>
+            </a>
+            <a href="/reports" class="flex flex-col items-center gap-3 p-6 rounded-xl border border-slate-100 bg-slate-50 text-slate-700 hover:bg-slate-100 transition text-center">
+                <i class="fas fa-file-invoice-dollar text-2xl"></i>
+                <span class="font-bold text-sm">View Profit</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

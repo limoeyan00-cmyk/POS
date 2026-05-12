@@ -5,3 +5,8 @@ token.json
 __pycache__/
 *.py[cod]
 *$py.class
+node_modules/
+downloads/
+pos.db
+dist/
+.DS_Store
